@@ -7,4 +7,4 @@ edition = "2024"
 tokio = { version = "1", features = ["full"] }
 axum = "0.8.4"
 lingua = "1.7.2"
-serde = "1.0.219"
+serde = "1.0.224"
