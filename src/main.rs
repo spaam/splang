@@ -57,6 +57,6 @@ async fn main() {
         .route("/", post(detect_lang))
         .with_state(app_state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8344").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8344").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
