@@ -33,21 +33,15 @@ async fn detect_lang(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<Message>,
 ) -> (StatusCode, Json<Langdetected>) {
-    let detected_language = state.detector.detect_language_of(payload.query);
-    let lang = match detected_language {
-        None => "und",
-        lang => &lang.unwrap().iso_code_639_3().to_string(),
+    let lang = match state.detector.detect_language_of(payload.query) {
+        None => "und".to_string(),
+        Some(lang) => lang.iso_code_639_3().to_string(),
     };
-    (
-        StatusCode::OK,
-        Json(Langdetected {
-            language: lang.into(),
-        }),
-    )
+    (StatusCode::OK, Json(Langdetected { language: lang }))
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let detector = LanguageDetectorBuilder::from_all_languages()
         .with_low_accuracy_mode()
         .build();
@@ -57,8 +51,7 @@ async fn main() {
         .route("/", post(detect_lang))
         .with_state(app_state);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8344")
-        .await
-        .unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8344").await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }
